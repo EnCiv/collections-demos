@@ -25,25 +25,6 @@ class Forms extends Collection {
 // Important - Initialize collection properties
 Forms.setCollectionProps();
 
-/*
- * Create readline interface for getting user input
- */
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
-
-/*
- * Helper function to prompt user and get their response
- */
-function prompt(question) {
-  return new Promise((resolve) => {
-    rl.question(question, (answer) => {
-      resolve(answer);
-    });
-  });
-}
-
 async function main() {
   try {
     console.log('Welcome to the Form Collection Demo!\n');
@@ -85,7 +66,7 @@ async function main() {
     allEntries.forEach((doc, index) => {
       // Extract timestamp from MongoDB ObjectId
       const createdAt = doc._id.getTimestamp().toISOString();
-      console.log(`${index + 1}. firstName: ${doc.firstName}, favoriteFruit: ${doc.favoriteFruit}, created: ${createdAt}`);
+      console.log(`${index + 1}. ${JSON.stringify(doc)}, created: ${createdAt}`);
     });
 
     console.log('\nNote: The \'created\' timestamp is extracted from the MongoDB ObjectId\n');
@@ -106,3 +87,25 @@ async function main() {
 }
 
 main();
+/* 
+* Okay, Its bad form but I moved these below to focus on the main logic
+*/
+
+/*
+ * Create readline interface for getting user input
+ */
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+/*
+ * Helper function to prompt user and get their response
+ */
+function prompt(question) {
+  return new Promise((resolve) => {
+    rl.question(question, (answer) => {
+      resolve(answer);
+    });
+  });
+}

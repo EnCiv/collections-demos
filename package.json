@@ -4,7 +4,10 @@
   "description": "Educational demos for @enciv/mongo-collections showing MongoDB integration with JavaScript",
   "main": "demo1-form-collection.js",
   "scripts": {
-    "demo1": "node demo1-form-collection.js"
+    "demo1": "node demo1-form-collection.js",
+    "demo2": "node demo2-form-with-schema.js",
+    "demo3": "node demo3-aggregation-lookup.js",
+    "demo4": "node demo4-separate-collections.js"
   },
   "keywords": [
     "mongodb",

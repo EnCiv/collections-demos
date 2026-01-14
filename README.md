@@ -94,6 +94,192 @@ Note: The 'created' timestamp is extracted from the MongoDB ObjectId
 - Displays all entries with timestamps extracted from their ObjectIds
 - Data persists between runs
 
+### Demo 2: Form Collection with Schema Validation
+
+**File:** `demo2-form-with-schema.js`
+
+This demo demonstrates:
+- Defining a collection with MongoDB schema validation
+- Using `collectionOptions` to enforce data rules
+- Handling validation errors
+- Ensuring data integrity at the database level
+
+**Run the demo:**
+
+```bash
+node demo2-form-with-schema.js
+```
+
+Or use the npm script:
+
+```bash
+npm run demo2
+```
+
+**What's different from Demo 1:**
+- Uses a separate collection (`forms-validated`) with schema validation
+- MongoDB enforces that `firstName` and `favoriteFruit` must be strings and are required
+- Invalid data will be rejected before insertion
+- Shows how to handle validation errors (error code 121)
+
+**Key code difference:**
+```javascript
+class Forms extends Collection {
+  static collectionName = 'forms-validated'
+  static collectionOptions = {
+    validator: {
+      $jsonSchema: {
+        bsonType: 'object',
+        required: ['firstName', 'favoriteFruit'],
+        properties: {
+          firstName: { bsonType: 'string' },
+          favoriteFruit: { bsonType: 'string' }
+        }
+      }
+    }
+  }
+}
+```
+
+### Demo 3: Aggregation with Lookup
+
+**File:** `demo3-aggregation-lookup.js`
+
+This demo demonstrates:
+- Storing related documents with parent references
+- Using MongoDB aggregation pipeline
+- Using `$lookup` to join related documents
+- Retrieving all related data in a single round trip to the database
+
+**Run the demo:**
+
+```bash
+node demo3-aggregation-lookup.js
+```
+
+Or use the npm script:
+
+```bash
+npm run demo3
+```
+
+**Example interaction:**
+
+```
+Welcome to the Aggregation Demo!
+
+First Name: Alice
+Favorite Fruit: bananas
+
+Entry saved!
+
+Enter friends (press Enter without typing to finish):
+Friend 1: Bob
+Friend 2: Charlie
+Friend 3: Diana
+Friend 4: 
+
+3 friend(s) added!
+
+All entries in the collection (with friends joined):
+1. firstName: Alice, favoriteFruit: bananas, friends: [Bob, Charlie, Diana], created: 2026-01-13T10:45:23.456Z
+
+Note: All data retrieved in a single aggregation query using $lookup
+Note: Each friend is stored as a separate document with a parentId reference
+```
+
+**How it works:**
+- Creates a main entry with `firstName` and `favoriteFruit`
+- Prompts for friends repeatedly until user hits Enter
+- Each friend is stored as a separate document with `friendName` and `parentId`
+- Uses aggregation pipeline with `$lookup` to join friends with their parent in one query
+- Demonstrates efficient data retrieval - all related data in a single round trip
+
+**Key aggregation pipeline:**
+```javascript
+Forms.aggregate([
+  { $match: { firstName: { $exists: true } } },
+  { 
+    $lookup: {
+      from: 'forms-aggregate',
+      localField: '_id',
+      foreignField: 'parentId',
+      as: 'friendDocs'
+    }
+  },
+  { $project: { friends: '$friendDocs.friendName' } }
+])
+```
+
+### Demo 4: Separate Collections with Schemas and Aggregation
+
+**File:** `demo4-separate-collections.js`
+
+This demo demonstrates:
+- Defining multiple collections with their own schema validation
+- Storing related data in separate collections (Forms and Friends)
+- Using `$lookup` to join data across different collections
+- Schema validation on both collections
+- Best practice: separating concerns into different collections
+
+**Run the demo:**
+
+```bash
+node demo4-separate-collections.js
+```
+
+Or use the npm script:
+
+```bash
+npm run demo4
+```
+
+**What's different from Demo 3:**
+- Friends stored in a separate `Friends` collection (not mixed with Forms)
+- Both collections have schema validation
+- Forms schema requires `firstName` and `favoriteFruit` as strings
+- Friends schema requires `friendName` (string) and `parentId` (ObjectId)
+- Shows proper data modeling with separate collections
+
+**Key collection definitions:**
+```javascript
+class Forms extends Collection {
+  static collectionName = 'forms-with-friends'
+  static collectionOptions = {
+    validator: { $jsonSchema: { /* ... */ } }
+  }
+}
+
+class Friends extends Collection {
+  static collectionName = 'friends'
+  static collectionOptions = {
+    validator: {
+      $jsonSchema: {
+        required: ['friendName', 'parentId'],
+        properties: {
+          friendName: { bsonType: 'string' },
+          parentId: { bsonType: 'objectId' }
+        }
+      }
+    }
+  }
+}
+```
+
+**Aggregation across collections:**
+```javascript
+Forms.aggregate([
+  { 
+    $lookup: {
+      from: 'friends',  // Join with Friends collection
+      localField: '_id',
+      foreignField: 'parentId',
+      as: 'friendDocs'
+    }
+  }
+])
+```
+
 ## Key Concepts Demonstrated
 
 ### MongoDB ObjectId Timestamps
