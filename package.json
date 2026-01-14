@@ -1,0 +1,21 @@
+{
+  "name": "collections-demo",
+  "version": "1.0.0",
+  "description": "Educational demos for @enciv/mongo-collections showing MongoDB integration with JavaScript",
+  "main": "demo1-form-collection.js",
+  "scripts": {
+    "demo1": "node demo1-form-collection.js"
+  },
+  "keywords": [
+    "mongodb",
+    "demo",
+    "collections",
+    "education"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@enciv/mongo-collections": "^0.0.3",
+    "dotenv": "^16.0.0"
+  }
+}
