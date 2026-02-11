@@ -9,7 +9,7 @@
  */
 
 const { Mongo } = require('@enciv/mongo-collections');
-const Forms = require('../model/forms');
+const Forms = require('../models/forms');
 
 describe('Forms Collection', () => {
   beforeAll(async () => {
